@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "lapidary"
+name = "lapidarist"
 version = "0.0.1"
 description = "Extract and Resolve for AI Systems"
 authors = ["Adam Pingel <oss@pingel.org>"]
 license = "ASFv2"
 readme = "README.md"
-packages = [{include = "lapidary"}]
+packages = [{include = "lapidarist"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"

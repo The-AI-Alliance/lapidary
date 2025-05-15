@@ -1,6 +1,6 @@
 from rich import print
 
-from lapidary.verbs.display import header
+from lapidarist.verbs.display import header
 
 
 def test_header():
