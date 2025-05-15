@@ -30,4 +30,4 @@ jobs:
         uv pip install pytest
 
     - name: Run tests
-      run: pytest
+      run: python -m pytest
