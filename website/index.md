@@ -8,6 +8,8 @@ title: Lapidarist
 Lapidarist is a small library for using LLMs to create
 various kinds of indices and data structures used by AI Agents.
 
+<img src="./assets/images/gem_graph.png" align="left" width="250px" alt="gem graph"/>
+
 One common supported pattern is to extract structured
 knowledge from documents, resolve derived entity references,
 and load the resulting inforation into a graph database as a
