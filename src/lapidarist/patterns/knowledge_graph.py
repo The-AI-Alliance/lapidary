@@ -38,7 +38,7 @@ def load_knowledge_graph(
         with db.transaction:
 
             log.info("Clearing the graph")
-            db.cypher_query("MATCH (n) DETACH DELETE n") 
+            db.cypher_query("MATCH (n) DETACH DELETE n")
 
             log.info("Loading %s enriched documents into the graph", len(enrichmentss))
             for e in enrichmentss:
