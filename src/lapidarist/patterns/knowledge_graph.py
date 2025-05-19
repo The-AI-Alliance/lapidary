@@ -1,14 +1,34 @@
 from typing import Callable
-from typing import Any
 
+from enum import StrEnum
 import logging
 import json
 from pydantic import BaseModel
 from rich.progress import Progress
 from neo4j import Driver
-from neomodel import db
+from neomodel import (
+    db,
+    StructuredNode,
+    StringProperty,
+    UniqueIdProperty,
+    RelationshipFrom,
+    One,
+)
 
 log = logging.getLogger(__name__)
+
+
+class RelationLabel(StrEnum):
+    MENTIONS = "MENTIONS"
+    REFERS_TO = "REFERS_TO"
+
+
+class Reference(StructuredNode):
+    uid = UniqueIdProperty()
+    referer = RelationshipFrom(StructuredNode, RelationLabel.MENTIONS, cardinality=One)
+    text = StringProperty(required=True)
+    # confidence = StringProperty(default="0.0")
+    # referent = RelationshipTo(_, RelationLabel.REFERS_TO, cardinality=ZeroOrOne)
 
 
 def load_knowledge_graph(
