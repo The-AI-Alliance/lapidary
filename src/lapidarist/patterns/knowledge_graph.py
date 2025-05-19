@@ -1,21 +1,44 @@
 from typing import Callable
-from typing import Any
 
+from enum import StrEnum
 import logging
 import json
 from pydantic import BaseModel
 from rich.progress import Progress
 from neo4j import Driver
+from neomodel import (
+    db,
+    StructuredNode,
+    StringProperty,
+    UniqueIdProperty,
+    RelationshipFrom,
+    One,
+)
 
 log = logging.getLogger(__name__)
+
+
+class RelationLabel(StrEnum):
+    MENTIONS = "MENTIONS"
+    REFERS_TO = "REFERS_TO"
+
+
+class Reference(StructuredNode):
+    uid = UniqueIdProperty()
+    referer = RelationshipFrom(StructuredNode, RelationLabel.MENTIONS, cardinality=One)
+    text = StringProperty(required=True)
+    # confidence = StringProperty(default="0.0")
+    # referent = RelationshipTo(_, RelationLabel.REFERS_TO, cardinality=ZeroOrOne)
 
 
 def load_knowledge_graph(
     driver: Driver,
     enrichments_jsonl_file: str,
     enrichments_clazz: type[BaseModel],
-    doc_enrichments_to_graph: Callable[[Any, BaseModel], None],
+    doc_enrichments_to_graph: Callable[[BaseModel], None],
 ) -> None:
+
+    db.set_connection(driver=driver)
 
     log.info("Parsing enrichments from %s", enrichments_jsonl_file)
 
@@ -32,8 +55,12 @@ def load_knowledge_graph(
             total=len(enrichmentss),
         )
 
-        with driver.session() as session:
-            session.run("MATCH (n) DETACH DELETE n")  # empty graph
+        with db.transaction:
+
+            log.info("Clearing the graph")
+            db.cypher_query("MATCH (n) DETACH DELETE n")
+
+            log.info("Loading %s enriched documents into the graph", len(enrichmentss))
             for e in enrichmentss:
-                session.execute_write(doc_enrichments_to_graph, e)
+                doc_enrichments_to_graph(e)
                 progress.update(task_load, advance=1)
